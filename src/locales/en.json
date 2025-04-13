@@ -11,6 +11,16 @@
     "income_expense": "Income/Expenses",
     "analytics": "Analytics",
     "calculator": "Financial Calculator",
-    "markets": "Market Rates"
+    "markets": "Market Rates",
+    "login": "Login",
+    "register": "Register",
+    "email_or_phone": "Email or Phone",
+    "email_placeholder": "Enter your email or phone",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "login_button": "Login",
+    "register_button": "Register",
+    "no_account": "Don't have an account?",
+    "already_account": "Already have an account?"
 }
   

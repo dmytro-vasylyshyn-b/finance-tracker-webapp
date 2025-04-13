@@ -11,6 +11,15 @@
     "income_expense": "Сторінка доходів/витрат",
     "analytics": "Сторінка Аналітики",
     "calculator": "Фінансовий калькулятор",
-    "markets": "Курс валют/акцій"
+    "markets": "Курс валют/акцій",
+    "register": "Реєстрація",
+    "email_or_phone": "Email або телефон",
+    "email_placeholder": "Введіть email або телефон",
+    "password": "Пароль",
+    "password_placeholder": "Введіть ваш пароль",
+    "login_button": "Увійти",
+    "register_button": "Зареєструватись",
+    "no_account": "Ще не маєте акаунту?",
+    "already_account": "Вже є акаунт?"
 }
   
