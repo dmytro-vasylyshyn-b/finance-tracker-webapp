@@ -1,29 +1,24 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
 
-const resources = {
-  en: {
-    translation: {
-      welcome: "Welcome",
+// Імпортуємо повні JSON-файли
+import en from './locales/en.json'
+import uk from './locales/uk.json'
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: {
+      translation: en,
+    },
+    uk: {
+      translation: uk,
     },
   },
-  uk: {
-    translation: {
-      welcome: "Ласкаво просимо",
-    },
+  lng: 'uk', // або 'en' для англійської за замовчуванням
+  fallbackLng: 'en', // якщо ключа немає в uk, використовувати en
+  interpolation: {
+    escapeValue: false,
   },
-};
+})
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: "uk",
-    interpolation: {
-      escapeValue: false,
-    },
-  });
-
-export default i18n;
+export default i18n

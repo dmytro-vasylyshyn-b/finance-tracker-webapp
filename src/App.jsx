@@ -1,20 +1,52 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import Settings from "./pages/Settings";
-import AuthCallback from "./pages/AuthCallback";
+// src/App.js
+
+import React, { useState, useEffect } from 'react';
+import './i18n';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useTranslation } from 'react-i18next';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import ProfilePage from './pages/ProfilePage';
+import HomePage from './pages/HomePage';
+import Layout from './components/Layout'; // Новий компонент з Sidebar і Dropdown
 
 function App() {
+  const { i18n } = useTranslation();
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    document.body.classList.toggle('bg-dark', theme === 'dark');
+    document.body.classList.toggle('text-white', theme === 'dark');
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+  };
+
   return (
     <Router>
-      <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout theme={theme} toggleTheme={toggleTheme} changeLanguage={changeLanguage}>
+              <HomePage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Layout theme={theme} toggleTheme={toggleTheme} changeLanguage={changeLanguage}>
+              <ProfilePage />
+            </Layout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

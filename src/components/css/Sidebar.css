@@ -1,0 +1,162 @@
+.sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+  
+  
+.sidebar-container {
+height: 100%;
+width: 0;
+overflow: hidden;
+transition: width 0.3s ease;
+}
+
+.sidebar-container.open {
+width: 35%;
+min-width: 300px;
+max-width: 500px; /* було 400px */
+z-index: 10000; /* поверх усього */
+}
+
+
+.sidebar {
+height: 100%;
+padding: 1rem;
+overflow-y: auto;
+transition: background-color 0.3s ease;
+animation: fadeIn 0.3s ease-in-out;
+}
+
+.sidebar-container.light .sidebar {
+background-color: #ffffff;
+color: #212529;
+box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-container.dark .sidebar {
+background-color: #faf9f9;
+color: #f8f9fa;
+box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-link {
+padding: 0.75rem 1rem;
+display: block;
+font-size: 1.5rem;
+font-weight: 600;
+border-radius: 10px;
+text-decoration: none;
+opacity: 0;
+transform: translateX(-15px);
+animation: slideIn 0.4s ease forwards;
+transition: background-color 0.2s, color 0.2s;
+}
+
+
+.sidebar-container.open .sidebar-link:nth-child(1) { animation-delay: 0.05s; }
+.sidebar-container.open .sidebar-link:nth-child(2) { animation-delay: 0.1s; }
+.sidebar-container.open .sidebar-link:nth-child(3) { animation-delay: 0.15s; }
+.sidebar-container.open .sidebar-link:nth-child(4) { animation-delay: 0.2s; }
+.sidebar-container.open .sidebar-link:nth-child(5) { animation-delay: 2s; }
+
+.sidebar-container.light .sidebar-link {
+color: #000000;
+background-color: transparent;
+}
+
+.sidebar-container.dark .sidebar-link {
+color: #ffffff;
+background-color: transparent;
+}
+
+
+.sidebar-container.light .sidebar-link:hover {
+    background-color: #e0e0e0;
+    color: #000000;
+}
+
+.sidebar-container.dark .sidebar-link:hover {
+    background-color: #444444;
+    color: #ffffff;
+}
+  
+.sidebar-toggle-btn {
+position: absolute;
+top: 1rem;
+right: -2.5rem;
+padding: 0.6rem 1rem;
+border: none;
+border-radius: 12px;
+font-size: 1.3rem;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+z-index: 1100;
+}
+
+.sidebar-toggle-btn.light {
+background-color: #ffffff;
+color: #212529;
+}
+
+.sidebar-toggle-btn.light:hover {
+background-color: #f2f2f2;
+}
+
+.sidebar-toggle-btn.dark {
+background-color: #431b1b;
+color: #f8f9fa;
+}
+
+.sidebar-toggle-btn.dark:hover {
+background-color: #933636; 
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+@keyframes slideIn {
+to {
+    opacity: 1;
+    transform: translateX(0);
+}
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar-container.open {
+        width: 60%;
+    }
+
+    .sidebar-toggle-btn {
+        right: -3rem;
+    }
+}
+/* Звичайний текст — колір залежить від теми */
+.theme-light .sidebar-link {
+    color: #000000;
+    background-color: transparent;
+  }
+  
+  .theme-dark .sidebar-link {
+    color: #ffffff;
+    background-color: transparent;
+  }
+  
+  /* Hover — світліший фон для світлої теми */
+  .theme-light .sidebar-link:hover {
+    background-color: #e0e0e0;
+    color: #000000;
+  }
+  
+  /* Hover — темніший фон для темної теми */
+  .theme-dark .sidebar-link:hover {
+    background-color: #5f5d5d;
+    color: #ffffff;
+  }
+  
