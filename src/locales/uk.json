@@ -12,14 +12,18 @@
     "analytics": "Сторінка Аналітики",
     "calculator": "Фінансовий калькулятор",
     "markets": "Курс валют/акцій",
+    "login": "Увійти",
     "register": "Реєстрація",
     "email_or_phone": "Email або телефон",
     "email_placeholder": "Введіть email або телефон",
     "password": "Пароль",
     "password_placeholder": "Введіть ваш пароль",
-    "login_button": "Увійти",
-    "register_button": "Зареєструватись",
+    "confirm_password": "Підтвердження паролю",
+    "confirm_password_placeholder": "Повторіть пароль",
     "no_account": "Ще не маєте акаунту?",
-    "already_account": "Вже є акаунт?"
+    "already_account": "Вже є акаунт?",
+    "email_in_use": "Цей емейл вже зареєстрований",
+    "auth_error": "Помилка авторизації",
+    "logout": "Вийти"
 }
   

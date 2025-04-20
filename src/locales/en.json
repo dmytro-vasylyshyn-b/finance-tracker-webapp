@@ -17,10 +17,13 @@
     "email_or_phone": "Email or Phone",
     "email_placeholder": "Enter your email or phone",
     "password": "Password",
+    "confirm_password": "Confirm Password",
+    "confirm_password_placeholder": "Repeat your password",
     "password_placeholder": "Enter your password",
-    "login_button": "Login",
-    "register_button": "Register",
     "no_account": "Don't have an account?",
-    "already_account": "Already have an account?"
+    "already_account": "Already have an account?",
+    "email_in_use": "This email already in used",
+    "auth_error": "Authentification error",
+    "logout": "Log out"
 }
   
