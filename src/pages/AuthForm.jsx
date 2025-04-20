@@ -7,28 +7,33 @@ import { useTranslation } from "react-i18next";
 import axios from "../api/axios";
 import './css/AuthForm.css'
 
-const loginSchema = yup.object({
-  identifier: yup
-    .string()
-    .required("Введіть email або номер телефону")
-    .test("is-valid", "Невірний формат", (value) =>
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || /^\+?\d{10,15}$/.test(value)
-    ),
-  password: yup.string().required("Пароль обов'язковий").min(6, "Мінімум 6 символів"),
-});
-
-const registerSchema = loginSchema.shape({
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Паролі повинні співпадати")
-    .required("Підтвердження паролю обов'язкове"),
-});
 
 export default function AuthForm({ theme, toggleTheme }) {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+
+
+  const loginSchema = yup.object({
+    identifier: yup
+      .string()
+      .required(t("identifier_required"))
+      .test("is-valid", t("identifier_invalid"), (value) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || /^\+?\d{10,15}$/.test(value)
+      ),
+    password: yup
+      .string()
+      .required(t("password_required"))
+      .min(6, t("password_min")),
+  });
+  
+  const registerSchema = loginSchema.shape({
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password")], t("confirm_password_mismatch"))
+      .required(t("confirm_password_required")),
+  });
 
   const {
     register,
@@ -127,7 +132,7 @@ export default function AuthForm({ theme, toggleTheme }) {
               🌐 {i18n.language === "en" ? "Українська" : "English"}
             </button>
             <button type="button" onClick={toggleTheme}>
-              {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+              {theme === "dark" ? "☀️ " + t("switch_to_light") : "🌙"+ t("switch_to_dark")}
             </button>
           </div>
   

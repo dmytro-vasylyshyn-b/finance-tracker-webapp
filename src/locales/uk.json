@@ -24,6 +24,12 @@
     "already_account": "Вже є акаунт?",
     "email_in_use": "Цей емейл вже зареєстрований",
     "auth_error": "Помилка авторизації",
-    "logout": "Вийти"
+    "logout": "Вийти",
+    "identifier_required": "Введіть email або номер телефону",
+    "identifier_invalid": "Невірний формат",
+    "password_required": "Пароль обов'язковий",
+    "password_min": "Мінімум 6 символів",
+    "confirm_password_required": "Підтвердження паролю обов'язкове",
+    "confirm_password_mismatch": "Паролі повинні співпадати"
 }
   

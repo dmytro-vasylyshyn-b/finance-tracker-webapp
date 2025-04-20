@@ -24,6 +24,12 @@
     "already_account": "Already have an account?",
     "email_in_use": "This email already in used",
     "auth_error": "Authentification error",
-    "logout": "Log out"
+    "logout": "Log out",
+    "identifier_required": "Please enter an email or phone number",
+    "identifier_invalid": "Invalid format",
+    "password_required": "Password is required",
+    "password_min": "Minimum 6 characters",
+    "confirm_password_required": "Password confirmation is required",
+    "confirm_password_mismatch": "Passwords must match"
 }
   
