@@ -25,6 +25,7 @@
     "email_in_use": "Цей емейл вже зареєстрований",
     "auth_error": "Помилка авторизації",
     "logout": "Вийти",
+    "invalid_credentials": "Невірний email або пароль.",
     "identifier_required": "Введіть email або номер телефону",
     "identifier_invalid": "Невірний формат",
     "password_required": "Пароль обов'язковий",

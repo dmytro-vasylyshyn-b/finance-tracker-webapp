@@ -63,21 +63,16 @@ export default function AuthForm({ theme, toggleTheme }) {
             firstName: "Ім'я",
             lastName: "Прізвище",
           };
-
+  
       const response = await axios.post(endpoint, payload);
       localStorage.setItem("token", response.data.token);
       navigate("/");
       window.location.reload();
     } catch (err) {
-      if (
-        err.response &&
-        err.response.data &&
-        err.response.data.message === "Email already in use"
-      ) {
-        setError(t("email_in_use"));
-      } else {
-        setError(err.response?.data?.message || t("auth_error"));
-      }
+      const errorKey = err.response?.data?.message;
+      const fallback = isLogin ? t("invalid_credentials") : t("invalid_credentials");
+  
+      setError(t(`errors.${errorKey}`) || fallback);
     }
   };
 

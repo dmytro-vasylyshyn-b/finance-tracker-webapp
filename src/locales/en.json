@@ -29,6 +29,7 @@
     "identifier_invalid": "Invalid format",
     "password_required": "Password is required",
     "password_min": "Minimum 6 characters",
+    "invalid_credentials": "Invalid email or password.",
     "confirm_password_required": "Password confirmation is required",
     "confirm_password_mismatch": "Passwords must match"
 }
