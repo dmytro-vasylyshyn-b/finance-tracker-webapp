@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from "../api/axios";
 import './css/ProfilePage.css';
 
 const ProfilePage = () => {
@@ -12,25 +13,100 @@ const ProfilePage = () => {
     profilePic: null,
   });
 
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('/api/profile');
+        setUserData({
+          firstName: response.data.firstName,
+          lastName: response.data.lastName,
+          patronymic: response.data.patronymic || '',
+          theme: response.data.theme || 'light',
+          language: response.data.language || 'ua',
+          startPage: response.data.startPage || 'home',
+          profilePic: response.data.profilePicUrl || null,
+        });
+      } catch (err) {
+        console.error('Failed to fetch user data', err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'profilePic') {
       setUserData({ ...userData, profilePic: URL.createObjectURL(files[0]) });
+      handlePhotoUpload(files[0]);
     } else {
       setUserData({ ...userData, [name]: value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData({ ...passwordData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Saved user data:', userData);
-    // Тут можна зробити запит на бекенд для збереження
+    try {
+      const updatedData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        patronymic: userData.patronymic,
+        theme: userData.theme,
+        language: userData.language,
+        startPage: userData.startPage,
+      };
+      await axios.put('/api/profile', updatedData);
+      alert('Дані успішно оновлено');
+    } catch (err) {
+      console.error('Помилка при збереженні профілю', err);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('Паролі не співпадають');
+      return;
+    }
+    try {
+      await axios.put('/api/profile/password', {
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      });
+      alert('Пароль змінено');
+      setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      console.error('Помилка зміни паролю', err);
+    }
+  };
+
+  const handlePhotoUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await axios.post('/api/profile/photo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      console.log('Фото завантажено:', res.data);
+    } catch (err) {
+      console.error('Не вдалося завантажити фото', err);
+    }
   };
 
   return (
     <div className="profile-page">
       <h2>Профіль користувача</h2>
-
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-group">
           <label>Ім’я:</label>
@@ -54,10 +130,13 @@ const ProfilePage = () => {
         </div>
 
         <div className="form-group">
-          <label>Зміна пароля:</label>
-          <input type="password" placeholder="Старий пароль" />
-          <input type="password" placeholder="Новий пароль" />
-          <input type="password" placeholder="Підтвердження пароля" />
+          <label>Старий пароль:</label>
+          <input type="password" name="oldPassword" value={passwordData.oldPassword} onChange={handlePasswordChange} />
+          <label>Новий пароль:</label>
+          <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} />
+          <label>Підтвердження пароля:</label>
+          <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} />
+          <button type="button" onClick={handleChangePassword} className="save-btn">Змінити пароль</button>
         </div>
 
         <div className="form-group">
