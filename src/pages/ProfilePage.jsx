@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from "../api/axios";
+import { useTranslation } from "react-i18next";
+import { buildProfileUpdateDto } from '../modules/ProfileUpdateDto';
 import './css/ProfilePage.css';
 
 const ProfilePage = () => {
@@ -12,6 +14,9 @@ const ProfilePage = () => {
     startPage: 'home',
     profilePic: null,
   });
+  const { t } =useTranslation();
+
+  
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
@@ -19,32 +24,49 @@ const ProfilePage = () => {
     confirmPassword: '',
   });
 
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('/api/profile');
+        const response = await axios.get('/api/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+            
+        if (!response.data) {
+          console.error('Порожня відповідь або користувач не знайдений');
+          return;
+        }
+    
         setUserData({
-          firstName: response.data.firstName,
-          lastName: response.data.lastName,
-          patronymic: response.data.patronymic || '',
-          theme: response.data.theme || 'light',
-          language: response.data.language || 'ua',
+          firstName: response.data.firstName || '',
+          lastName: response.data.lastName || '',
+          patronymic: response.data.middleName || '',
+          theme: response.data.preferredTheme || 'light',
+          language: response.data.preferredLanguage || 'ua',
           startPage: response.data.startPage || 'home',
           profilePic: response.data.profilePicUrl || null,
         });
       } catch (err) {
-        console.error('Failed to fetch user data', err);
+        console.error('Не вдалося завантажити дані профілю', err);
       }
     };
+    
 
-    fetchUserData();
-  }, []);
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'profilePic') {
-      setUserData({ ...userData, profilePic: URL.createObjectURL(files[0]) });
-      handlePhotoUpload(files[0]);
+      if (files && files.length > 0) {
+        setUserData({ ...userData, profilePic: URL.createObjectURL(files[0]) });
+        handlePhotoUpload(files[0]);
+      }
     } else {
       setUserData({ ...userData, [name]: value });
     }
@@ -58,15 +80,12 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedData = {
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        patronymic: userData.patronymic,
-        theme: userData.theme,
-        language: userData.language,
-        startPage: userData.startPage,
-      };
-      await axios.put('/api/profile', updatedData);
+      const updatedData = buildProfileUpdateDto(userData);
+      await axios.put('/api/profile', updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       alert('Дані успішно оновлено');
     } catch (err) {
       console.error('Помилка при збереженні профілю', err);
@@ -82,11 +101,15 @@ const ProfilePage = () => {
       await axios.put('/api/profile/password', {
         oldPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      alert('Пароль змінено');
+      alert('Пароль успішно змінено');
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
-      console.error('Помилка зміни паролю', err);
+      console.error('Помилка зміни пароля', err);
     }
   };
 
@@ -95,60 +118,73 @@ const ProfilePage = () => {
     formData.append('file', file);
 
     try {
-      const res = await axios.post('/api/profile/photo', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      await axios.post('/api/profile/photo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
       });
-      console.log('Фото завантажено:', res.data);
+      console.log('Фото завантажено успішно');
     } catch (err) {
-      console.error('Не вдалося завантажити фото', err);
+      console.error('Помилка завантаження фото', err);
     }
   };
 
   return (
     <div className="profile-page">
-      <h2>Профіль користувача</h2>
+      <h2>{t('user_profile')}</h2>
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-group">
-          <label>Ім’я:</label>
+          <label>{t('first_name')}:</label>
           <input name="firstName" value={userData.firstName} onChange={handleChange} />
         </div>
 
         <div className="form-group">
-          <label>Прізвище:</label>
+          <label>{t('last_name')}:</label>
           <input name="lastName" value={userData.lastName} onChange={handleChange} />
         </div>
 
         <div className="form-group">
-          <label>По батькові:</label>
+          <label>{t('patronymic')}:</label>
           <input name="patronymic" value={userData.patronymic} onChange={handleChange} />
         </div>
 
         <div className="form-group">
-          <label>Фото профілю:</label>
+          <label>{t('profile_picture')}:</label>
           <input type="file" name="profilePic" accept="image/*" onChange={handleChange} />
-          {userData.profilePic && <img src={userData.profilePic} alt="Profile Preview" className="preview-img" />}
+          {userData.profilePic && (
+            <>
+              <p>{t('profile_preview')}:</p>
+              <img src={userData.profilePic} alt="Profile Preview" className="preview-img" />
+            </>
+          )}
         </div>
 
         <div className="form-group">
-          <label>Старий пароль:</label>
+          <label>{t('old_password')}:</label>
           <input type="password" name="oldPassword" value={passwordData.oldPassword} onChange={handlePasswordChange} />
-          <label>Новий пароль:</label>
+
+          <label>{t('new_password')}:</label>
           <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} />
-          <label>Підтвердження пароля:</label>
+
+          <label>{t('confirm_password')}:</label>
           <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} />
-          <button type="button" onClick={handleChangePassword} className="save-btn">Змінити пароль</button>
+
+          <button type="button" onClick={handleChangePassword} className="save-btn">
+            {t('change_password')}
+          </button>
         </div>
 
         <div className="form-group">
-          <label>Тема за замовчуванням:</label>
+          <label>{t('default_theme')}:</label>
           <select name="theme" value={userData.theme} onChange={handleChange}>
-            <option value="light">Світла</option>
-            <option value="dark">Темна</option>
+            <option value="light">{t('switch_to_light')}</option>
+            <option value="dark">{t('switch_to_dark')}</option>
           </select>
         </div>
 
         <div className="form-group">
-          <label>Мова інтерфейсу:</label>
+          <label>{t('interface_language')}:</label>
           <select name="language" value={userData.language} onChange={handleChange}>
             <option value="ua">Українська</option>
             <option value="en">English</option>
@@ -156,17 +192,17 @@ const ProfilePage = () => {
         </div>
 
         <div className="form-group">
-          <label>Стартова сторінка:</label>
+          <label>{t('start_page')}:</label>
           <select name="startPage" value={userData.startPage} onChange={handleChange}>
-            <option value="home">Головна</option>
-            <option value="income_expense">Доходи/Витрати</option>
-            <option value="analytics">Аналітика</option>
-            <option value="calculator">Калькулятор</option>
-            <option value="markets">Ринки</option>
+            <option value="home">{t('home')}</option>
+            <option value="income_expense">{t('income_expense')}</option>
+            <option value="analytics">{t('analytics')}</option>
+            <option value="calculator">{t('calculator')}</option>
+            <option value="markets">{t('markets')}</option>
           </select>
         </div>
 
-        <button type="submit" className="save-btn">Зберегти зміни</button>
+        <button type="submit" className="save-btn">{t('save_changes')}</button>
       </form>
     </div>
   );

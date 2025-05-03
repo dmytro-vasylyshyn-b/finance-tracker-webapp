@@ -31,6 +31,19 @@
     "password_min": "Minimum 6 characters",
     "invalid_credentials": "Invalid email or password.",
     "confirm_password_required": "Password confirmation is required",
-    "confirm_password_mismatch": "Passwords must match"
+    "confirm_password_mismatch": "Passwords must match",
+    "user_profile": "User Profile",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "patronymic": "Patronymic",
+    "profile_picture": "Profile Picture",
+    "old_password": "Old Password",
+    "new_password": "New Password",
+    "change_password": "Change Password",
+    "default_theme": "Default Theme",
+    "interface_language": "Interface Language",
+    "start_page": "Start Page",
+    "save_changes": "Save Changes",
+    "profile_preview": "Profile Preview"
 }
   

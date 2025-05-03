@@ -31,6 +31,19 @@
     "password_required": "Пароль обов'язковий",
     "password_min": "Мінімум 6 символів",
     "confirm_password_required": "Підтвердження паролю обов'язкове",
-    "confirm_password_mismatch": "Паролі повинні співпадати"
+    "confirm_password_mismatch": "Паролі повинні співпадати",
+    "user_profile": "Профіль користувача",
+    "first_name": "Ім’я",
+    "last_name": "Прізвище",
+    "patronymic": "По батькові",
+    "profile_picture": "Фото профілю",
+    "old_password": "Старий пароль",
+    "new_password": "Новий пароль",
+    "change_password": "Змінити пароль",
+    "default_theme": "Тема за замовчуванням",
+    "interface_language": "Мова інтерфейсу",
+    "start_page": "Головна сторінка",
+    "save_changes": "Зберегти зміни",
+    "profile_preview": "Profile Preview"
 }
   
