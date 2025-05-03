@@ -65,11 +65,14 @@ export default function AuthForm({ theme, toggleTheme }) {
           };
   
       const response = await axios.post(endpoint, payload);
-      console.log("Saved token:", response.data.token);
-      localStorage.setItem("token", response.data.token);
-      console.log("Saved token:", localStorage.getItem("token"));
-      navigate("/");
-      window.location.reload();
+
+      if (isLogin) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+        window.location.reload();
+      } else {
+        window.location.reload();
+      }
     } catch (err) {
       const errorKey = err.response?.data?.message;
       const fallback = isLogin ? t("invalid_credentials") : t("invalid_credentials");

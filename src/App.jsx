@@ -38,7 +38,7 @@ function App() {
                 <HomePage />
               </Layout>
             ) : (
-              <Navigate to="/auth" /> // ✅ редірект на /auth якщо немає токена
+              <Navigate to="/auth" /> 
             )
           }
         />
@@ -56,7 +56,7 @@ function App() {
         />
         <Route
           path="/auth"
-          element={token ? <Navigate to="/" /> : <AuthForm theme={theme} toggleTheme={toggleTheme} />} // ✅ додано AuthForm для авторизації
+          element={token ? <Navigate to="/" /> : <AuthForm theme={theme} toggleTheme={toggleTheme} />}
         />
       </Routes>
     </Router>

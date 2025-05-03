@@ -3,12 +3,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Мовні файли
 import enTranslations from './src/locales/en.json';
 import ukTranslations from './src/locales/uk.json';
 
+const savedLang = localStorage.getItem('preferredLanguage') || 'uk';
+
 i18n
-  .use(initReactI18next) // використовуємо react-i18next
+  .use(initReactI18next) 
   .init({
     resources: {
       en: {
@@ -18,10 +19,10 @@ i18n
         translation: ukTranslations,
       },
     },
-    lng: 'uk', // Мова за замовчуванням
-    fallbackLng: 'en', // Якщо мови немає, використовуємо цю
+    lng: savedLang, 
+    fallbackLng: 'en', 
     interpolation: {
-      escapeValue: false, // не потрібно екранізувати текст
+      escapeValue: false, 
     },
   });
 

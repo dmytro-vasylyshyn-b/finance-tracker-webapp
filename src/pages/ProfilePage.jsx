@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from "../api/axios";
 import { useTranslation } from "react-i18next";
 import { buildProfileUpdateDto } from '../modules/ProfileUpdateDto';
@@ -14,15 +14,17 @@ const ProfilePage = () => {
     startPage: 'home',
     profilePic: null,
   });
-  const { t } =useTranslation();
-
-  
+  const { t } = useTranslation();
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const token = localStorage.getItem('token');
 
@@ -34,12 +36,12 @@ const ProfilePage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-            
+
         if (!response.data) {
           console.error('Порожня відповідь або користувач не знайдений');
           return;
         }
-    
+
         setUserData({
           firstName: response.data.firstName || '',
           lastName: response.data.lastName || '',
@@ -49,11 +51,17 @@ const ProfilePage = () => {
           startPage: response.data.startPage || 'home',
           profilePic: response.data.profilePicUrl || null,
         });
+
+        const imgPath = response.data.profileImagePath;
+        if (imgPath) {
+          const fullUrl = `http://localhost:8080${imgPath}`;
+          setPreviewUrl(fullUrl);
+        }        
+
       } catch (err) {
         console.error('Не вдалося завантажити дані профілю', err);
       }
     };
-    
 
     if (token) {
       fetchUserData();
@@ -61,15 +69,8 @@ const ProfilePage = () => {
   }, [token]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'profilePic') {
-      if (files && files.length > 0) {
-        setUserData({ ...userData, profilePic: URL.createObjectURL(files[0]) });
-        handlePhotoUpload(files[0]);
-      }
-    } else {
-      setUserData({ ...userData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
   };
 
   const handlePasswordChange = (e) => {
@@ -86,6 +87,7 @@ const ProfilePage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log
       alert('Дані успішно оновлено');
     } catch (err) {
       console.error('Помилка при збереженні профілю', err);
@@ -113,9 +115,25 @@ const ProfilePage = () => {
     }
   };
 
-  const handlePhotoUpload = async (file) => {
+  const handlePhotoClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedPhotoFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!selectedPhotoFile) return;
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', selectedPhotoFile);
 
     try {
       await axios.post('/api/profile/photo', formData, {
@@ -124,7 +142,7 @@ const ProfilePage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('Фото завантажено успішно');
+      alert('Фото успішно завантажено');
     } catch (err) {
       console.error('Помилка завантаження фото', err);
     }
@@ -149,14 +167,25 @@ const ProfilePage = () => {
           <input name="patronymic" value={userData.patronymic} onChange={handleChange} />
         </div>
 
-        <div className="form-group">
+        <div className="form-group photo-upload">
           <label>{t('profile_picture')}:</label>
-          <input type="file" name="profilePic" accept="image/*" onChange={handleChange} />
-          {userData.profilePic && (
-            <>
-              <p>{t('profile_preview')}:</p>
-              <img src={userData.profilePic} alt="Profile Preview" className="preview-img" />
-            </>
+          <button type="button" onClick={handlePhotoClick} className="upload-btn">
+            {t('choose_photo')}
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept="image/*"
+            onChange={handleFileSelect}
+          />
+          {previewUrl && (
+            <div className="photo-preview-wrapper">
+              <img src={previewUrl} className="circular-photo" />
+              <button type="button" onClick={handlePhotoUpload} className="save-btn">
+                {t('save_photo')}
+              </button>
+            </div>
           )}
         </div>
 
