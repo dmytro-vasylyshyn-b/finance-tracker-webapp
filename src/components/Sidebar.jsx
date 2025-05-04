@@ -19,19 +19,19 @@ const Sidebar = ({ theme }) => {
         <div className={`sidebar`}>
           <ul className="nav flex-column p-3">
             <li className="nav-item">
-              <a href="#" className={linkClass}>{t('home')}</a>
+              <a href="/" className={linkClass}>{t('home')}</a>
             </li>
             <li className="nav-item">
-              <a href="#" className={linkClass}>{t('income_expense')}</a>
+              <a href="/income" className={linkClass}>{t('income_expense')}</a>
             </li>
             <li className="nav-item">
-              <a href="#" className={linkClass}>{t('analytics')}</a>
+              <a href="/analitics" className={linkClass}>{t('analytics')}</a>
             </li>
             <li className="nav-item">
-              <a href="#" className={linkClass}>{t('calculator')}</a>
+              <a href="/calculator" className={linkClass}>{t('calculator')}</a>
             </li>
             <li className="nav-item">
-              <a href="#" className={linkClass}>{t('markets')}</a>
+              <a href="markets" className={linkClass}>{t('markets')}</a>
             </li>
           </ul>
         </div>
