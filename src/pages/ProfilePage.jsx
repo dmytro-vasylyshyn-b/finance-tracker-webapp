@@ -149,92 +149,114 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="profile-page">
-      <h2>{t('user_profile')}</h2>
-      <form onSubmit={handleSubmit} className="profile-form">
-        <div className="form-group">
-          <label>{t('first_name')}:</label>
-          <input name="firstName" value={userData.firstName} onChange={handleChange} />
-        </div>
-
-        <div className="form-group">
-          <label>{t('last_name')}:</label>
-          <input name="lastName" value={userData.lastName} onChange={handleChange} />
-        </div>
-
-        <div className="form-group">
-          <label>{t('patronymic')}:</label>
-          <input name="patronymic" value={userData.patronymic} onChange={handleChange} />
-        </div>
-
-        <div className="form-group photo-upload">
-          <label>{t('profile_picture')}:</label>
-          <button type="button" onClick={handlePhotoClick} className="upload-btn">
-            {t('choose_photo')}
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept="image/*"
-            onChange={handleFileSelect}
-          />
-          {previewUrl && (
-            <div className="photo-preview-wrapper">
-              <img src={previewUrl} className="circular-photo" />
-              <button type="button" onClick={handlePhotoUpload} className="save-btn">
-                {t('save_photo')}
+    <div className={"profile-page"}>
+      <div className={"profile-form-container"}>
+        <h2>{t('user_profile')}</h2>
+        <form onSubmit={handleSubmit} className="profile-form">
+          <div className="form-group">
+            <label>{t('first_name')}:</label>
+            <input name="firstName" value={userData.firstName} onChange={handleChange} />
+          </div>
+  
+          <div className="form-group">
+            <label>{t('last_name')}:</label>
+            <input name="lastName" value={userData.lastName} onChange={handleChange} />
+          </div>
+  
+          <div className="form-group">
+            <label>{t('patronymic')}:</label>
+            <input name="patronymic" value={userData.patronymic} onChange={handleChange} />
+          </div>
+  
+          <div className="form-group full-width two-columns">
+            <div className="password-column">
+              <label>{t('old_password')}:</label>
+              <input
+                type="password"
+                name="oldPassword"
+                value={passwordData.oldPassword}
+                onChange={handlePasswordChange}
+              />
+  
+              <label>{t('new_password')}:</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+              />
+  
+              <label>{t('confirm_password')}:</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+              />
+  
+              <button type="button" onClick={handleChangePassword} className="save-btn">
+                {t('change_password')}
               </button>
             </div>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>{t('old_password')}:</label>
-          <input type="password" name="oldPassword" value={passwordData.oldPassword} onChange={handlePasswordChange} />
-
-          <label>{t('new_password')}:</label>
-          <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} />
-
-          <label>{t('confirm_password')}:</label>
-          <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} />
-
-          <button type="button" onClick={handleChangePassword} className="save-btn">
-            {t('change_password')}
-          </button>
-        </div>
-
-        <div className="form-group">
-          <label>{t('default_theme')}:</label>
-          <select name="theme" value={userData.theme} onChange={handleChange}>
-            <option value="light">{t('switch_to_light')}</option>
-            <option value="dark">{t('switch_to_dark')}</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>{t('interface_language')}:</label>
-          <select name="language" value={userData.language} onChange={handleChange}>
-            <option value="ua">Українська</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>{t('start_page')}:</label>
-          <select name="startPage" value={userData.startPage} onChange={handleChange}>
-            <option value="home">{t('home')}</option>
-            <option value="income_expense">{t('income_expense')}</option>
-            <option value="analytics">{t('analytics')}</option>
-            <option value="calculator">{t('calculator')}</option>
-            <option value="markets">{t('markets')}</option>
-          </select>
-        </div>
-
-        <button type="submit" className="save-btn">{t('save_changes')}</button>
-      </form>
+  
+            <div className="photo-column">
+              <label>{t('profile_picture')}:</label>
+              <button type="button" onClick={handlePhotoClick} className="upload-btn">
+                {t('choose_photo')}
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={handleFileSelect}
+              />
+              {previewUrl && (
+                <div className="photo-preview-wrapper">
+                  <img src={previewUrl} className="circular-photo" alt="Preview" />
+                  <button type="button" onClick={handlePhotoUpload} className="save-btn">
+                    {t('save_photo')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+  
+          <div className="form-group">
+            <label>{t('default_theme')}:</label>
+            <select name="theme" value={userData.theme} onChange={handleChange}>
+              <option value="light">{t('switch_to_light')}</option>
+              <option value="dark">{t('switch_to_dark')}</option>
+            </select>
+          </div>
+  
+          <div className="form-group">
+            <label>{t('interface_language')}:</label>
+            <select name="language" value={userData.language} onChange={handleChange}>
+              <option value="ua">Українська</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+  
+          <div className="form-group full-width">
+            <label>{t('start_page')}:</label>
+            <select name="startPage" value={userData.startPage} onChange={handleChange}>
+              <option value="home">{t('home')}</option>
+              <option value="income_expense">{t('income_expense')}</option>
+              <option value="analytics">{t('analytics')}</option>
+              <option value="calculator">{t('calculator')}</option>
+              <option value="markets">{t('markets')}</option>
+            </select>
+          </div>
+  
+          <div className="form-group full-width">
+            <button type="submit" className="save-btn">{t('save_changes')}</button>
+          </div>
+        </form>
+      </div>
     </div>
-  );
+  );  
+  
 };
 
 export default ProfilePage;
