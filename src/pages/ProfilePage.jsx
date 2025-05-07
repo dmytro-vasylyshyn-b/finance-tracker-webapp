@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { PreferencesContext } from '../context/PreferencesContext';
 import axios from "../api/axios";
 import { useTranslation } from "react-i18next";
 import { buildProfileUpdateDto } from '../modules/ProfileUpdateDto';
@@ -15,6 +16,7 @@ const ProfilePage = () => {
     profilePic: null,
   });
   const { t } = useTranslation();
+  const { setTheme, setLanguage, savePreferences } = useContext(PreferencesContext);
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
@@ -87,6 +89,13 @@ const ProfilePage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      await savePreferences({
+        theme: userData.theme,
+        language: userData.language,
+      });
+  
+      setTheme(userData.theme);
+      setLanguage(userData.language);
       console.log
       alert('Дані успішно оновлено');
     } catch (err) {
