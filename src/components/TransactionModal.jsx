@@ -41,11 +41,12 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
       setForm({
         type: transaction.type,
         amount: transaction.amount,
-        categoryId: transaction.category?.id || '',
-        categoryName: transaction.category?.name || '',
+        description: transaction.description || '',
+        categoryId: transaction.categoryId || '', // Додаємо categoryId
+        categoryName: transaction.categoryName || '', // Якщо categoryName є
         date: new Date(transaction.date).toISOString().slice(0, 16),
       });
-      setIsCustom(transaction.category?.custom === true);
+      setIsCustom(transaction.categoryName === 'custom'); // Якщо це кастомна категорія
     } else {
       setForm({
         type: 'EXPENSE',

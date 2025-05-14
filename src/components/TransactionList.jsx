@@ -1,36 +1,36 @@
 // src/components/TransactionList.jsx
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card } from 'react-bootstrap';
+import './css/TransactionList.css';
 
 const TransactionList = ({ transactions, onEdit }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="mt-3">
+    <div className="transaction-list">
       {transactions.length === 0 ? (
-        <p className="text-center">{t('no_transactions')}</p>
+        <p className="text-center w-100">{t('no_transactions')}</p>
       ) : (
         transactions.map((tx) => (
-          <Card
+          <div
             key={tx.id}
-            className="mb-2 shadow-sm"
-            bg={tx.type === 'expense' ? 'danger' : tx.type === 'income' ? 'success' : 'info'}
-            text="white"
+            className={`tx-card ${tx.type.toLowerCase()}`}
             onClick={() => onEdit(tx)}
-            style={{ cursor: 'pointer' }}
           >
-            <Card.Body className="d-flex justify-content-between align-items-center">
-              <div>
-                <Card.Title>{tx.category}</Card.Title>
-                <Card.Subtitle className="text-white-50">{new Date(tx.date).toLocaleString()}</Card.Subtitle>
-              </div>
-              <h5>
-                {tx.type === 'expense' ? '-' : '+'}
+            <div className="tx-header">
+              <span>{tx.category}</span>
+              <span>
+                {tx.type === 'EXPENSE' ? '-' : '+'}
                 {tx.amount} ₴
-              </h5>
-            </Card.Body>
-          </Card>
+              </span>
+            </div>
+            <div className="tx-footer">
+              <span>{tx.description}</span>
+              <span className="tx-date">
+                {new Date(tx.date).toLocaleString()}
+              </span>
+            </div>
+          </div>
         ))
       )}
     </div>

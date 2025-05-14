@@ -110,7 +110,12 @@ const IncomePage = () => {
             </Card>
           </Carousel.Item>
           <Carousel.Item className="h-100">
-            <Card className="text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-light dark:bg-dark text-dark dark:text-light shadow-sm border-0 rounded-4">
+            <Card className="text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-light dark:bg-dark text-dark dark:text-light shadow-sm border-0 rounded-4"
+                style={{
+                  backgroundColor: '#e5f0ff', // блакитний
+                  color: '#0066cc'
+                }}
+                >
               <h4>{t('Investments')}</h4>
               <p className="fs-4 text-primary">
                 ₴{(transactions || []).filter(tx => tx.type === 'INVESTMENTS').reduce((a, b) => a + (b.amount || 0), 0)}

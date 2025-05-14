@@ -1,0 +1,56 @@
+.transaction-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    padding: 1rem 0;
+  }
+  
+  .tx-card {
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .tx-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .tx-card.expense {
+    background-color: #ffe6e6;
+    border-left: 5px solid #ff4d4d;
+  }
+  
+  .tx-card.income {
+    background-color: #e6ffe6;
+    border-left: 5px solid #33cc33;
+  }
+  
+  .tx-card.investments {
+    background-color: #e6f0ff;
+    border-left: 5px solid #3399ff;
+  }
+  
+  .tx-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tx-footer {
+    font-size: 0.9rem;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .tx-date {
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+  
