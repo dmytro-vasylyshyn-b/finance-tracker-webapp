@@ -1,117 +1,190 @@
-// src/components/TransactionModal.jsx
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import axios from '../api/axios';
 
-const defaultCategories = {
-  expense: ['Продукти', 'Комунальні послуги', 'Транспорт'],
-  income: ['Зарплата', 'Фріланс'],
-  investment: ['Депозит', 'Акції']
-};
-
-const TransactionModal = ({ show, handleClose, onSave, initialData }) => {
+const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
   const { t } = useTranslation();
 
   const [form, setForm] = useState({
-    type: 'expense',
+    type: 'EXPENSE',
     amount: '',
-    category: '',
+    categoryId: '',
+    categoryName: '',
     date: new Date().toISOString().slice(0, 16),
-    customCategory: ''
   });
+  const [categories, setCategories] = useState([]);
+  const [isCustom, setIsCustom] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
-      setForm({
-        ...initialData,
-        date: new Date(initialData.date).toISOString().slice(0, 16),
-        customCategory: ''
-      });
+    if (show) {
+      const type = transaction?.type || 'EXPENSE';
+      loadCategories(type);
     }
-  }, [initialData]);
+  }, [show]);
+
+  const loadCategories = async (type) => {
+    try {
+      const res = await axios.get(`/api/categories?type=${type}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error('Помилка при завантаженні категорій:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (transaction) {
+      setForm({
+        type: transaction.type,
+        amount: transaction.amount,
+        categoryId: transaction.category?.id || '',
+        categoryName: transaction.category?.name || '',
+        date: new Date(transaction.date).toISOString().slice(0, 16),
+      });
+      setIsCustom(transaction.category?.custom === true);
+    } else {
+      setForm({
+        type: 'EXPENSE',
+        amount: '',
+        description: '',
+        categoryId: '',
+        categoryName: '',
+        date: new Date().toISOString().slice(0, 16),
+      });
+      setIsCustom(false);
+    }
+  }, [transaction]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'type') {
+      loadCategories(value);
+      setForm(f => ({ ...f, [name]: value, categoryId: '', categoryName: '' }));
+      setIsCustom(false);
+    } else if (name === 'categoryId' && value === 'custom') {
+      setIsCustom(true);
+      setForm(f => ({ ...f, categoryId: '', categoryName: '' }));
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
   };
 
-  const handleSubmit = () => {
-    const category = form.category === 'custom' ? form.customCategory : form.category;
-    onSave({ ...form, category });
-    handleClose();
-  };
+  const handleSubmit = async () => {
+    try {
+      let categoryId = form.categoryId;
+      let categoryName = form.categoryName;
 
-  const categories = defaultCategories[form.type];
+      if (isCustom && categoryName) {
+        const response = await axios.post(
+          '/api/categories',
+          {
+            name: categoryName,
+            type: form.type,
+            custom: true,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+        categoryId = response.data.id;
+      }
+
+      const payload = {
+        type: form.type,
+        amount: form.amount,
+        description: form.description,
+        date: form.date,
+        categoryId: categoryId,
+      };
+
+      if (transaction) {
+        await axios.put(`/api/expenses/${transaction.id}`, payload, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+      } else {
+        await axios.post('/api/expenses', payload, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+      }
+
+      onSuccess(); // Reload list
+      onClose();   // Close modal
+    } catch (err) {
+      console.error('Помилка при збереженні транзакції:', err);
+      alert(t('error_saving_transaction'));
+    }
+  };
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
-        <Modal.Title>{initialData ? t('edit_transaction') : t('new_transaction')}</Modal.Title>
+        <Modal.Title>
+          {transaction ? t('edit_transaction') : t('new_transaction')}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group>
             <Form.Label>{t('type')}</Form.Label>
             <Form.Select name="type" value={form.type} onChange={handleChange}>
-              <option value="expense">{t('expense')}</option>
-              <option value="income">{t('income')}</option>
-              <option value="investment">{t('investment')}</option>
+              <option value="EXPENSE">{t('expense')}</option>
+              <option value="INCOME">{t('income')}</option>
+              <option value="INVESTMENTS">{t('investment')}</option>
             </Form.Select>
           </Form.Group>
 
           <Form.Group className="mt-2">
             <Form.Label>{t('amount')}</Form.Label>
-            <Form.Control
-              type="number"
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              required
-            />
+            <Form.Control type="number" name="amount" value={form.amount} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mt-2">
             <Form.Label>{t('category')}</Form.Label>
-            <Form.Select name="category" value={form.category} onChange={handleChange}>
+            <Form.Select name="categoryId" value={isCustom ? 'custom' : form.categoryId} onChange={handleChange}>
               <option value="">{t('choose')}</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
               <option value="custom">{t('custom_category')}</option>
             </Form.Select>
           </Form.Group>
 
-          {form.category === 'custom' && (
+          {isCustom && (
             <Form.Group className="mt-2">
               <Form.Label>{t('custom_category')}</Form.Label>
-              <Form.Control
-                type="text"
-                name="customCategory"
-                value={form.customCategory}
-                onChange={handleChange}
-              />
+              <Form.Control type="text" name="categoryName" value={form.categoryName} onChange={handleChange} />
             </Form.Group>
           )}
+          <Form.Group className="mt-2">
+            <Form.Label>{t('description')}</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+            />
+          </Form.Group>
 
           <Form.Group className="mt-2">
             <Form.Label>{t('date')}</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              required
-            />
+            <Form.Control type="datetime-local" name="date" value={form.date} onChange={handleChange} />
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          {t('cancel')}
-        </Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          {t('save')}
-        </Button>
+        <Button variant="secondary" onClick={onClose}>{t('cancel')}</Button>
+        <Button variant="primary" onClick={handleSubmit}>{t('save')}</Button>
       </Modal.Footer>
     </Modal>
   );
