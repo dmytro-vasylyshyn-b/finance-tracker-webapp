@@ -11,6 +11,8 @@ import Layout from './components/Layout';
 import AuthForm from './pages/AuthForm'; 
 import { PreferencesProvider } from './context/PreferencesContext';
 import Calculation from './pages/Calculation'
+import AnalyticsPage from './pages/AnalyticsPage';
+
 function App() {
   const { i18n } = useTranslation();
   const [theme, setTheme] = useState('light');
@@ -71,6 +73,14 @@ function App() {
             element={
               token
                 ? wrapWithLayout(<IncomePage />)
+                : <Navigate to="/auth" />
+            }
+          />
+          <Route
+            path="/analitics"
+            element={
+              token
+                ? wrapWithLayout(<AnalyticsPage />)
                 : <Navigate to="/auth" />
             }
           />

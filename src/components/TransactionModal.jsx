@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import axios from '../api/axios';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
 
 const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
   const { t } = useTranslation();
@@ -15,24 +21,35 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
   });
   const [categories, setCategories] = useState([]);
   const [isCustom, setIsCustom] = useState(false);
+  const [allTransactions, setAllTransactions] = useState([]);
 
   useEffect(() => {
     if (show) {
       const type = transaction?.type || 'EXPENSE';
       loadCategories(type);
+      loadAllTransactions();
     }
   }, [show]);
 
   const loadCategories = async (type) => {
     try {
       const res = await axios.get(`/api/categories?type=${type}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setCategories(res.data || []);
     } catch (err) {
       console.error('Помилка при завантаженні категорій:', err);
+    }
+  };
+
+  const loadAllTransactions = async () => {
+    try {
+      const res = await axios.get('/api/expenses', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setAllTransactions(res.data || []);
+    } catch (err) {
+      console.error('Помилка при завантаженні транзакцій:', err);
     }
   };
 
@@ -42,11 +59,11 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
         type: transaction.type,
         amount: transaction.amount,
         description: transaction.description || '',
-        categoryId: transaction.categoryId || '', // Додаємо categoryId
-        categoryName: transaction.categoryName || '', // Якщо categoryName є
+        categoryId: transaction.categoryId || '',
+        categoryName: transaction.categoryName || '',
         date: new Date(transaction.date).toISOString().slice(0, 16),
       });
-      setIsCustom(transaction.categoryName === 'custom'); // Якщо це кастомна категорія
+      setIsCustom(transaction.categoryName === 'custom');
     } else {
       setForm({
         type: 'EXPENSE',
@@ -88,9 +105,7 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
             custom: true,
           },
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           }
         );
         categoryId = response.data.id;
@@ -106,24 +121,85 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
 
       if (transaction) {
         await axios.put(`/api/expenses/${transaction.id}`, payload, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
       } else {
         await axios.post('/api/expenses', payload, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
       }
 
-      onSuccess(); // Reload list
-      onClose();   // Close modal
+      onSuccess();
+      onClose();
     } catch (err) {
       console.error('Помилка при збереженні транзакції:', err);
       alert(t('error_saving_transaction'));
     }
+  };
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFont('Roboto');
+  
+    const tableData = allTransactions.map(tr => [
+      tr.date.slice(0, 10),
+      tr.amount,
+      tr.description || '',
+      tr.categoryName || '',
+      tr.type,
+    ]);
+  
+    autoTable(doc, {
+      head: [[t('date'), t('amount'), t('description'), t('category'), t('type')]],
+      body: tableData,
+      styles: { font: 'Roboto' },
+    });
+  
+    doc.save('transactions.pdf');
+  };
+  
+  
+  
+  const exportExcel = () => {
+    const headers = [t('date'), t('amount'), t('description'), t('category')];
+    const allHeaders = [...headers, t('type')];
+
+    const byType = (type) => allTransactions
+      .filter(tr => tr.type === type)
+      .map(tr => [tr.date.slice(0, 10), tr.amount, tr.description || '', tr.categoryName || '']);
+
+    const allData = allTransactions.map(tr => [
+      tr.date.slice(0, 10),
+      tr.amount,
+      tr.description || '',
+      tr.categoryName || '',
+      tr.type,
+    ]);
+
+    const wb = XLSX.utils.book_new();
+    const sheetNames = {
+      INCOME: 'доходи',
+      EXPENSE: 'витрати',
+      INVESTMENTS: 'інвестиції',
+      ALL: 'всі записи'
+    };
+
+    const addSheet = (data, headers, name) => {
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+      XLSX.utils.book_append_sheet(wb, ws, name);
+    };
+
+    addSheet(byType('INCOME'), headers, sheetNames.INCOME);
+    addSheet(byType('EXPENSE'), headers, sheetNames.EXPENSE);
+    addSheet(byType('INVESTMENTS'), headers, sheetNames.INVESTMENTS);
+    addSheet(allData, allHeaders, sheetNames.ALL);
+
+    // Застосовуємо фільтри (тільки на аркуші "всі записи")
+    const allSheet = wb.Sheets[sheetNames.ALL];
+    allSheet['!autofilter'] = { ref: `A1:E${allData.length + 1}` };
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'transactions.xlsx');
   };
 
   return (
@@ -183,9 +259,15 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
           </Form.Group>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>{t('cancel')}</Button>
-        <Button variant="primary" onClick={handleSubmit}>{t('save')}</Button>
+      <Modal.Footer className="d-flex flex-wrap justify-content-between">
+        <div className="mb-2">
+          <Button variant="success" onClick={exportPDF} className="me-2">{t('download_pdf')}</Button>
+          <Button variant="info" onClick={exportExcel}>{t('download_excel')}</Button>
+        </div>
+        <div>
+          <Button variant="secondary" onClick={onClose}>{t('cancel')}</Button>
+          <Button variant="primary" onClick={handleSubmit}>{t('save')}</Button>
+        </div>
       </Modal.Footer>
     </Modal>
   );
