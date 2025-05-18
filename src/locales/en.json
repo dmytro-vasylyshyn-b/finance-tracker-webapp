@@ -46,6 +46,16 @@
     "save_changes": "Save Changes",
     "profile_preview": "Profile Preview",
     "choose_photo": "Choose photo",
-    "save_photo": "Save photo"
+    "save_photo": "Save photo",
+    "save_photo": "Save photo",
+    "rates_title": "Currency, Cryptocurrency, and Stock Rates",
+    "currency_rates": "Currency Rates",
+    "bank": "Bank",
+    "crypto_rates": "Cryptocurrencies (Binance)",
+    "add_crypto": "Add cryptocurrency",
+    "add": "Add",
+    "stocks": "Stocks",
+    "add_stock": "Add stock",
+    "exchange_rates_title": "Financial Instruments"
 }
   

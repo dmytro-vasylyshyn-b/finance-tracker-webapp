@@ -12,6 +12,7 @@ import AuthForm from './pages/AuthForm';
 import { PreferencesProvider } from './context/PreferencesContext';
 import Calculation from './pages/Calculation'
 import AnalyticsPage from './pages/AnalyticsPage';
+import Rate from './pages/Rate';
 
 function App() {
   const { i18n } = useTranslation();
@@ -81,6 +82,14 @@ function App() {
             element={
               token
                 ? wrapWithLayout(<AnalyticsPage />)
+                : <Navigate to="/auth" />
+            }
+          />
+          <Route
+            path="/markets"
+            element={
+              token
+                ? wrapWithLayout(<Rate />)
                 : <Navigate to="/auth" />
             }
           />

@@ -31,7 +31,7 @@ const Sidebar = ({ theme }) => {
               <a href="/calculator" className={linkClass}>{t('calculator')}</a>
             </li>
             <li className="nav-item">
-              <a href="markets" className={linkClass}>{t('markets')}</a>
+              <a href="/markets" className={linkClass}>{t('markets')}</a>
             </li>
           </ul>
         </div>

@@ -1,6 +1,6 @@
 // src/context/PreferencesContext.jsx
 import { createContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from "../api/axios";
 import i18n from '../i18n';
 
 export const PreferencesContext = createContext();
@@ -8,6 +8,14 @@ export const PreferencesContext = createContext();
 export const PreferencesProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
   const [language, setLanguage] = useState('uk');
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('preferredTheme');
+    const storedLanguage = localStorage.getItem('preferredLanguage');
+
+    if (storedTheme) setTheme(storedTheme);
+    if (storedLanguage) setLanguage(storedLanguage);
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle('bg-dark', theme === 'dark');

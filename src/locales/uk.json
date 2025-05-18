@@ -46,6 +46,15 @@
     "save_changes": "Зберегти зміни",
     "profile_preview": "Profile Preview",
     "choose_photo": "Вибрати фото",
-    "save_photo": "зберегти фото"
+    "save_photo": "зберегти фото",
+    "rates_title": "Курси валют, криптовалют і акцій",
+    "currency_rates": "Курси валют",
+    "bank": "Банк",
+    "crypto_rates": "Криптовалюти (Binance)",
+    "add_crypto": "Додати криптовалюту",
+    "add": "Додати",
+    "stocks": "Акції",
+    "add_stock": "Додати акцію",
+    "exchange_rates_title": "Фінансові інструменти"
 }
   

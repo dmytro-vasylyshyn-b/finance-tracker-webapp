@@ -68,6 +68,19 @@ export default function AuthForm({ theme, toggleTheme }) {
 
       if (isLogin) {
         localStorage.setItem("token", response.data.token);
+        const profileResponse = await axios.get("/api/profile", {
+          headers: {
+            Authorization: `Bearer ${response.data.token}`,
+          },
+        });
+        localStorage.setItem("theme", theme);
+        localStorage.setItem("language", language);
+        const profileData = profileResponse.data;
+        const theme = profileData.preferredTheme || "light";
+        const language = profileData.preferredLanguage || "ua";
+        toggleTheme(theme);
+        i18n.changeLanguage(language);
+
         navigate("/");
         window.location.reload();
       } else {

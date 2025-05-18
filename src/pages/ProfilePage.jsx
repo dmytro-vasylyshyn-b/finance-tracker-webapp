@@ -31,6 +31,17 @@ const ProfilePage = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
+    const storedTheme = localStorage.getItem("preferredTheme");
+    const storedLanguage = localStorage.getItem("preferredLanguage");
+  
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+  
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+  
     const fetchUserData = async () => {
       try {
         const response = await axios.get('/api/profile', {
@@ -38,12 +49,12 @@ const ProfilePage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.data) {
           console.error('Порожня відповідь або користувач не знайдений');
           return;
         }
-
+  
         setUserData({
           firstName: response.data.firstName || '',
           lastName: response.data.lastName || '',
@@ -53,22 +64,23 @@ const ProfilePage = () => {
           startPage: response.data.startPage || 'home',
           profilePic: response.data.profilePicUrl || null,
         });
-
+  
         const imgPath = response.data.profileImagePath;
         if (imgPath) {
           const fullUrl = `http://localhost:8080${imgPath}`;
           setPreviewUrl(fullUrl);
         }        
-
+  
       } catch (err) {
         console.error('Не вдалося завантажити дані профілю', err);
       }
     };
-
+  
     if (token) {
       fetchUserData();
     }
-  }, [token]);
+  }, [token, setTheme, setLanguage]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,6 +108,8 @@ const ProfilePage = () => {
   
       setTheme(userData.theme);
       setLanguage(userData.language);
+      localStorage.setItem('preferredLanguage', userData.language);
+      localStorage.setItem('preferredTheme', userData.theme);
       console.log
       alert('Дані успішно оновлено');
     } catch (err) {
