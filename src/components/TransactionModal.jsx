@@ -2,12 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import axios from '../api/axios';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
-
 
 const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
   const { t } = useTranslation();
@@ -137,71 +131,6 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
     }
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.setFont('Roboto');
-  
-    const tableData = allTransactions.map(tr => [
-      tr.date.slice(0, 10),
-      tr.amount,
-      tr.description || '',
-      tr.categoryName || '',
-      tr.type,
-    ]);
-  
-    autoTable(doc, {
-      head: [[t('date'), t('amount'), t('description'), t('category'), t('type')]],
-      body: tableData,
-      styles: { font: 'Roboto' },
-    });
-  
-    doc.save('transactions.pdf');
-  };
-  
-  
-  
-  const exportExcel = () => {
-    const headers = [t('date'), t('amount'), t('description'), t('category')];
-    const allHeaders = [...headers, t('type')];
-
-    const byType = (type) => allTransactions
-      .filter(tr => tr.type === type)
-      .map(tr => [tr.date.slice(0, 10), tr.amount, tr.description || '', tr.categoryName || '']);
-
-    const allData = allTransactions.map(tr => [
-      tr.date.slice(0, 10),
-      tr.amount,
-      tr.description || '',
-      tr.categoryName || '',
-      tr.type,
-    ]);
-
-    const wb = XLSX.utils.book_new();
-    const sheetNames = {
-      INCOME: 'доходи',
-      EXPENSE: 'витрати',
-      INVESTMENTS: 'інвестиції',
-      ALL: 'всі записи'
-    };
-
-    const addSheet = (data, headers, name) => {
-      const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-      XLSX.utils.book_append_sheet(wb, ws, name);
-    };
-
-    addSheet(byType('INCOME'), headers, sheetNames.INCOME);
-    addSheet(byType('EXPENSE'), headers, sheetNames.EXPENSE);
-    addSheet(byType('INVESTMENTS'), headers, sheetNames.INVESTMENTS);
-    addSheet(allData, allHeaders, sheetNames.ALL);
-
-    // Застосовуємо фільтри (тільки на аркуші "всі записи")
-    const allSheet = wb.Sheets[sheetNames.ALL];
-    allSheet['!autofilter'] = { ref: `A1:E${allData.length + 1}` };
-
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'transactions.xlsx');
-  };
-
   return (
     <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
@@ -259,14 +188,14 @@ const TransactionModal = ({ show, onClose, onSuccess, transaction }) => {
           </Form.Group>
         </Form>
       </Modal.Body>
-      <Modal.Footer className="d-flex flex-wrap justify-content-between">
-        <div className="mb-2">
-          <Button variant="success" onClick={exportPDF} className="me-2">{t('download_pdf')}</Button>
-          <Button variant="info" onClick={exportExcel}>{t('download_excel')}</Button>
-        </div>
-        <div>
-          <Button variant="secondary" onClick={onClose}>{t('cancel')}</Button>
-          <Button variant="primary" onClick={handleSubmit}>{t('save')}</Button>
+      <Modal.Footer className="d-flex flex-wrap justify-content-between gap-2">
+        <div className="d-flex gap-2">
+          <Button variant="secondary" onClick={onClose}>
+            {t('cancel')}
+          </Button>
+          <Button variant="primary" onClick={handleSubmit}>
+            {t('save')}
+          </Button>
         </div>
       </Modal.Footer>
     </Modal>

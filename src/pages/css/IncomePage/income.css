@@ -1,0 +1,11 @@
+/* Для Bootstrap з підтримкою dark mode через клас .dark */
+.dark .card-custom-bg {
+    background-color: #222 !important; /* темний фон для карток */
+    color: #eee !important;
+  }
+  
+  .light .card-custom-bg {
+    background-color: #fff !important;
+    color: #222 !important;
+  }
+  

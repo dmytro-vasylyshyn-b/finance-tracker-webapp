@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import html2pdf from 'html2pdf.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './css/Calc.css';
+import { useTranslation } from 'react-i18next';
 
 const FinancialCalculator = () => {
   const [pdfRef, setPdfRef] = useState(null);
+  const [theme, setTheme] = useState('light');
+  const { t } = useTranslation();
 
   const handlePrint = () => {
     if (pdfRef) {
@@ -10,30 +15,38 @@ const FinancialCalculator = () => {
     }
   };
 
-  return (
-    <div ref={setPdfRef} className="max-w-4xl mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold text-center">Фінансовий калькулятор</h1>
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
-      <SimpleInterest />
-      <CompoundInterest />
-      <LoanCalculator />
-      <MortgageCalculator />
-      <ROICalculator />
-      <InflationCalculator />
-      <CurrencyConverter />
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  return (
+    <div ref={setPdfRef} className="container py-4">
+      <div className="d-flex justify-content-between align-items-center">
+        <h1 className="text-center">{t('calculatorTitle')}</h1>
+      </div>
+
+      <SimpleInterest t={t} />
+      <CompoundInterest t={t} />
+      <LoanCalculator t={t} />
+      <MortgageCalculator t={t} />
+      <ROICalculator t={t} />
+      <InflationCalculator t={t} />
+      <CurrencyConverter t={t} />
 
       <div className="text-center mt-6">
-        <button onClick={handlePrint} className="bg-blue-600 text-white px-4 py-2 rounded">
-          Зберегти у PDF
+        <button onClick={handlePrint} className="btn btn-primary">
+          {t('savePdf')}
         </button>
       </div>
     </div>
   );
 };
 
-// --- Компоненти розрахунків ---
-
-const SimpleInterest = () => {
+const SimpleInterest = ({ t }) => {
   const [principal, setPrincipal] = useState('');
   const [rate, setRate] = useState('');
   const [time, setTime] = useState('');
@@ -42,26 +55,26 @@ const SimpleInterest = () => {
   const calculate = () => {
     const P = parseFloat(principal);
     const r = parseFloat(rate) / 100;
-    const t = parseFloat(time);
-    if (!isNaN(P) && !isNaN(r) && !isNaN(t)) {
-      setInterest(P * r * t);
+    const tVal = parseFloat(time);
+    if (!isNaN(P) && !isNaN(r) && !isNaN(tVal)) {
+      setInterest(P * r * tVal);
     }
   };
 
   return (
-    <Section title="Прості відсотки">
-      <Input label="Початкова сума" value={principal} setValue={setPrincipal} />
-      <Input label="Річна ставка (%)" value={rate} setValue={setRate} />
-      <Input label="Період (роки)" value={time} setValue={setTime} />
-      <Button onClick={calculate}>Розрахувати</Button>
+    <Section title={t('simpleInterest')}>
+      <Input label={t('initialAmount')} value={principal} setValue={setPrincipal} />
+      <Input label={t('annualRate')} value={rate} setValue={setRate} />
+      <Input label={t('periodYears')} value={time} setValue={setTime} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
       {interest !== null && (
-        <p>Нараховані відсотки: {interest.toFixed(2)}</p>
+        <p>{t('roi')}: {interest.toFixed(2)}</p>
       )}
     </Section>
   );
 };
 
-const CompoundInterest = () => {
+const CompoundInterest = ({ t }) => {
   const [principal, setPrincipal] = useState('');
   const [rate, setRate] = useState('');
   const [time, setTime] = useState('');
@@ -71,27 +84,27 @@ const CompoundInterest = () => {
   const calculate = () => {
     const P = parseFloat(principal);
     const r = parseFloat(rate) / 100;
-    const t = parseFloat(time);
+    const tVal = parseFloat(time);
     const n = parseInt(compoundings);
-    if (!isNaN(P) && !isNaN(r) && !isNaN(t) && !isNaN(n)) {
-      const A = P * Math.pow(1 + r / n, n * t);
+    if (!isNaN(P) && !isNaN(r) && !isNaN(tVal) && !isNaN(n)) {
+      const A = P * Math.pow(1 + r / n, n * tVal);
       setAmount(A);
     }
   };
 
   return (
-    <Section title="Складні відсотки">
-      <Input label="Початкова сума" value={principal} setValue={setPrincipal} />
-      <Input label="Річна ставка (%)" value={rate} setValue={setRate} />
-      <Input label="Період (роки)" value={time} setValue={setTime} />
-      <Input label="Нарахувань на рік" value={compoundings} setValue={setCompoundings} />
-      <Button onClick={calculate}>Розрахувати</Button>
-      {amount !== null && <p>Накопичена сума: {amount.toFixed(2)}</p>}
+    <Section title={t('compoundInterest')}>
+      <Input label={t('initialAmount')} value={principal} setValue={setPrincipal} />
+      <Input label={t('annualRate')} value={rate} setValue={setRate} />
+      <Input label={t('periodYears')} value={time} setValue={setTime} />
+      <Input label={t('compoundPerYear')} value={compoundings} setValue={setCompoundings} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
+      {amount !== null && <p>{t('futureValue')}: {amount.toFixed(2)}</p>}
     </Section>
   );
 };
 
-const LoanCalculator = () => {
+const LoanCalculator = ({ t }) => {
   const [amount, setAmount] = useState('');
   const [rate, setRate] = useState('');
   const [years, setYears] = useState('');
@@ -108,17 +121,17 @@ const LoanCalculator = () => {
   };
 
   return (
-    <Section title="Кредитний калькулятор">
-      <Input label="Сума кредиту" value={amount} setValue={setAmount} />
-      <Input label="Річна ставка (%)" value={rate} setValue={setRate} />
-      <Input label="Термін (роки)" value={years} setValue={setYears} />
-      <Button onClick={calculate}>Розрахувати</Button>
-      {payment !== null && <p>Щомісячний платіж: {payment.toFixed(2)}</p>}
+    <Section title={t('loanCalculator')}>
+      <Input label={t('loanAmount')} value={amount} setValue={setAmount} />
+      <Input label={t('annualRate')} value={rate} setValue={setRate} />
+      <Input label={t('termYears')} value={years} setValue={setYears} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
+      {payment !== null && <p>{t('monthlyPayment')}: {payment.toFixed(2)}</p>}
     </Section>
   );
 };
 
-const MortgageCalculator = () => {
+const MortgageCalculator = ({ t }) => {
   const [loan, setLoan] = useState('');
   const [down, setDown] = useState('');
   const [rate, setRate] = useState('');
@@ -139,23 +152,23 @@ const MortgageCalculator = () => {
   };
 
   return (
-    <Section title="Іпотечний калькулятор">
-      <Input label="Ціна житла" value={loan} setValue={setLoan} />
-      <Input label="Початковий внесок" value={down} setValue={setDown} />
-      <Input label="Річна ставка (%)" value={rate} setValue={setRate} />
-      <Input label="Термін (роки)" value={years} setValue={setYears} />
-      <Button onClick={calculate}>Розрахувати</Button>
+    <Section title={t('mortgageCalculator')}>
+      <Input label={t('homePrice')} value={loan} setValue={setLoan} />
+      <Input label={t('downPayment')} value={down} setValue={setDown} />
+      <Input label={t('annualRate')} value={rate} setValue={setRate} />
+      <Input label={t('termYears')} value={years} setValue={setYears} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
       {monthly !== null && (
         <>
-          <p>Щомісячний платіж: {monthly.toFixed(2)}</p>
-          <p>Загальна переплата: {overpay.toFixed(2)}</p>
+          <p>{t('monthlyPayment')}: {monthly.toFixed(2)}</p>
+          <p>{t('totalOverpay')}: {overpay.toFixed(2)}</p>
         </>
       )}
     </Section>
   );
 };
 
-const ROICalculator = () => {
+const ROICalculator = ({ t }) => {
   const [initial, setInitial] = useState('');
   const [final, setFinal] = useState('');
   const [roi, setRoi] = useState(null);
@@ -169,16 +182,16 @@ const ROICalculator = () => {
   };
 
   return (
-    <Section title="ROI калькулятор">
-      <Input label="Початкова інвестиція" value={initial} setValue={setInitial} />
-      <Input label="Кінцева вартість" value={final} setValue={setFinal} />
-      <Button onClick={calculate}>Розрахувати</Button>
-      {roi !== null && <p>ROI: {roi.toFixed(2)}%</p>}
+    <Section title={t('roiCalculator')}>
+      <Input label={t('initialInvestment')} value={initial} setValue={setInitial} />
+      <Input label={t('finalValue')} value={final} setValue={setFinal} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
+      {roi !== null && <p>{t('roi')}: {roi.toFixed(2)}%</p>}
     </Section>
   );
 };
 
-const InflationCalculator = () => {
+const InflationCalculator = ({ t }) => {
   const [amount, setAmount] = useState('');
   const [rate, setRate] = useState('');
   const [years, setYears] = useState('');
@@ -187,24 +200,24 @@ const InflationCalculator = () => {
   const calculate = () => {
     const P = parseFloat(amount);
     const i = parseFloat(rate) / 100;
-    const t = parseFloat(years);
-    if (!isNaN(P) && !isNaN(i) && !isNaN(t)) {
-      setFuture(P * Math.pow(1 + i, t));
+    const tVal = parseFloat(years);
+    if (!isNaN(P) && !isNaN(i) && !isNaN(tVal)) {
+      setFuture(P * Math.pow(1 + i, tVal));
     }
   };
 
   return (
-    <Section title="Калькулятор інфляції">
-      <Input label="Сума зараз" value={amount} setValue={setAmount} />
-      <Input label="Річна інфляція (%)" value={rate} setValue={setRate} />
-      <Input label="Період (роки)" value={years} setValue={setYears} />
-      <Button onClick={calculate}>Розрахувати</Button>
-      {future !== null && <p>Майбутня вартість: {future.toFixed(2)}</p>}
+    <Section title={t('inflationCalculator')}>
+      <Input label={t('currentAmount')} value={amount} setValue={setAmount} />
+      <Input label={t('inflation')} value={rate} setValue={setRate} />
+      <Input label={t('periodYears')} value={years} setValue={setYears} />
+      <Button onClick={calculate}>{t('calculate')}</Button>
+      {future !== null && <p>{t('futureValue')}: {future.toFixed(2)}</p>}
     </Section>
   );
 };
 
-const CurrencyConverter = () => {
+const CurrencyConverter = ({ t }) => {
   const [amount, setAmount] = useState('');
   const [rate, setRate] = useState('');
   const [converted, setConverted] = useState(null);
@@ -218,19 +231,17 @@ const CurrencyConverter = () => {
   };
 
   return (
-    <Section title="Конвертер валют">
-      <Input label="Сума" value={amount} setValue={setAmount} />
-      <Input label="Курс" value={rate} setValue={setRate} />
-      <Button onClick={convert}>Конвертувати</Button>
-      {converted !== null && <p>Результат: {converted.toFixed(2)}</p>}
+    <Section title={t('currencyConverter')}>
+      <Input label={t('amount')} value={amount} setValue={setAmount} />
+      <Input label={t('exchangeRate')} value={rate} setValue={setRate} />
+      <Button onClick={convert}>{t('convert')}</Button>
+      {converted !== null && <p>{t('convertedAmount')}: {converted.toFixed(2)}</p>}
     </Section>
   );
 };
 
-// --- Допоміжні компоненти ---
-
 const Section = ({ title, children }) => (
-  <div className="border rounded p-4 shadow-md">
+  <div className="border rounded p-4 shadow-md mb-4">
     <h2 className="text-xl font-semibold mb-2">{title}</h2>
     <div className="space-y-2">{children}</div>
   </div>
@@ -238,18 +249,18 @@ const Section = ({ title, children }) => (
 
 const Input = ({ label, value, setValue }) => (
   <div>
-    <label className="block text-sm font-medium mb-1">{label}</label>
+    <label className="form-label">{label}</label>
     <input
       type="number"
       value={value}
       onChange={(e) => setValue(e.target.value)}
-      className="border px-2 py-1 w-full rounded"
+      className="form-control"
     />
   </div>
 );
 
 const Button = ({ onClick, children }) => (
-  <button onClick={onClick} className="bg-green-500 text-white px-4 py-2 rounded">
+  <button onClick={onClick} className="btn btn-success">
     {children}
   </button>
 );

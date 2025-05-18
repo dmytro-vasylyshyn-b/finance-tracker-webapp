@@ -8,9 +8,11 @@ import TransactionModal from '../components/TransactionModal';
 import { Plus } from 'lucide-react';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import { exportToPDF, exportToExcel } from '../components/exportUtils';
+import './css/IncomePage/income.css';
 
 const IncomePage = () => {
-  const { t } = useTranslation(); 
+  const { t, i18n } = useTranslation(); 
   const [showModal, setShowModal] = useState(false);
   const [editTransaction, setEditTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -21,10 +23,23 @@ const IncomePage = () => {
     minAmount: '',
     maxAmount: ''
   });
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(20);
+  const [showAll, setShowAll] = useState(false);
+
+  // Визначаємо, чи темна тема — припускаємо, що тема зберігається в localStorage або через клас body
+  // Тут приклад з localStorage (налаштуй під свій проект)
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    setPage(0);
+  }, [filters, showAll]);
 
   useEffect(() => {
     fetchTransactions();
-  }, [filters]);
+  }, [filters, page, showAll]);
 
   const fetchTransactions = async () => {
     try {
@@ -35,15 +50,25 @@ const IncomePage = () => {
       if (filters.minAmount) params.append('minAmount', filters.minAmount);
       if (filters.maxAmount) params.append('maxAmount', filters.maxAmount);
 
-      const res = await axios.get(`/api/expenses/filtered?page=0&size=10&sort=date,desc&${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+      const size = showAll ? 1000 : pageSize;
+
+      const res = await axios.get(
+        `/api/expenses/filtered?page=${page}&size=${size}&sort=date,desc&${params.toString()}`, 
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
         }
-      });
-      setTransactions(res.data.content || []);
+      );
+
+      if (page === 0) {
+        setTransactions(res.data.content || []);
+      } else {
+        setTransactions(prev => [...prev, ...(res.data.content || [])]);
+      }
     } catch (err) {
       console.error('Не вдалося завантажити транзакції', err);
-      setTransactions([]);
+      if (page === 0) setTransactions([]);
     }
   };
 
@@ -67,18 +92,33 @@ const IncomePage = () => {
         category: newTx.category === 'custom' ? newTx.customCategory : newTx.category,
       };
 
-      const res = await axios.post('/api/expenses', payload, {
+      await axios.post('/api/expenses', payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      setPage(0);
       fetchTransactions();
       setShowModal(false);
     } catch (error) {
       console.error('Помилка при додаванні транзакції:', error);
       alert('Не вдалося додати транзакцію.');
     }
+  };
+
+  const cardClassName = "text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-dark text-light shadow-sm border-0 rounded-4";
+
+  const investmentsCardStyle = {
+    backgroundColor: '#003366',
+    color: '#aad4ff',
+  };
+
+  const carouselContainerStyle = {
+    borderRadius: '1rem',
+    overflow: 'hidden',
+    height: '100%',
+    backgroundColor: isDarkTheme ? '#111111' : '#ffffff'
   };
 
   return (
@@ -89,34 +129,29 @@ const IncomePage = () => {
           controls={true}
           interval={null}
           className="h-100"
-          style={{ borderRadius: '1rem', overflow: 'hidden' }}
+          style={carouselContainerStyle}
           nextIcon={<span className="carousel-control-next-icon" style={{ filter: 'invert(0.3)', opacity: 0.5 }} />}
           prevIcon={<span className="carousel-control-prev-icon" style={{ filter: 'invert(0.3)', opacity: 0.5 }} />}
         >
           <Carousel.Item className="h-100">
-            <Card className="text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-light dark:bg-dark text-dark dark:text-light shadow-sm border-0 rounded-4">
-              <h4>{t('Expenses')}</h4>
+            <Card className={cardClassName}>
+              <h4 className="text-dark">{t('expense')}</h4>
               <p className="fs-4 text-danger">
                 ₴{(transactions || []).filter(tx => tx.type === 'EXPENSE').reduce((a, b) => a + (b.amount || 0), 0)}
               </p>
             </Card>
           </Carousel.Item>
           <Carousel.Item className="h-100">
-            <Card className="text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-light dark:bg-dark text-dark dark:text-light shadow-sm border-0 rounded-4">
-              <h4>{t('Income')}</h4>
+            <Card className={cardClassName}>
+              <h4 className="text-dark">{t('income')}</h4>
               <p className="fs-4 text-success">
                 ₴{(transactions || []).filter(tx => tx.type === 'INCOME').reduce((a, b) => a + (b.amount || 0), 0)}
               </p>
             </Card>
           </Carousel.Item>
           <Carousel.Item className="h-100">
-            <Card className="text-center p-4 h-100 d-flex flex-column justify-content-center align-items-center bg-light dark:bg-dark text-dark dark:text-light shadow-sm border-0 rounded-4"
-                style={{
-                  backgroundColor: '#e5f0ff', // блакитний
-                  color: '#0066cc'
-                }}
-                >
-              <h4>{t('Investments')}</h4>
+            <Card className={cardClassName} style={investmentsCardStyle}>
+              <h4 className="text-dark">{t('investment')}</h4>
               <p className="fs-4 text-primary">
                 ₴{(transactions || []).filter(tx => tx.type === 'INVESTMENTS').reduce((a, b) => a + (b.amount || 0), 0)}
               </p>
@@ -152,18 +187,58 @@ const IncomePage = () => {
 
       <TransactionList transactions={transactions || []} onEdit={handleEdit} />
 
+      <div className="mb-3 d-flex gap-2 align-items-center">
+        <button 
+          className="btn btn-outline-primary"
+          onClick={() => {
+            setPage(prev => prev + 1);
+          }}
+          disabled={showAll}
+        >
+          {t('load_more')}
+        </button>
+
+        <div className="form-check ms-3">
+          <input 
+            className="form-check-input" 
+            type="checkbox" 
+            id="showAll" 
+            checked={showAll} 
+            onChange={(e) => {
+              setShowAll(e.target.checked);
+              setPage(0);
+            }}
+          />
+          <label className="form-check-label" htmlFor="showAll">
+            {t('show_all')}
+          </label>
+        </div>
+      </div>
+
       <Button
         onClick={handleAdd}
-        className="btn btn-primary position-fixed bottom-0 end-0 m-4 rounded-circle"
-        style={{ width: '60px', height: '60px' }}
+        className="btn btn-primary position-fixed bottom-0 end-0 m-4 p-0 d-flex justify-content-center align-items-center"
+        style={{ width: '60px', height: '60px', borderRadius: '50%' }}
       >
         <Plus size={32} />
       </Button>
 
+      <div className="mb-3 d-flex gap-2">
+        <button className="btn btn-outline-danger" onClick={() => exportToPDF(transactions, t)}>
+          {t('download_pdf')}
+        </button>
+        <button className="btn btn-outline-success" onClick={() => exportToExcel(transactions, t)}>
+          {t('download_excel')}
+        </button>
+      </div>
+
       <TransactionModal
         show={showModal}
         onClose={() => setShowModal(false)}
-        onSuccess={fetchTransactions}
+        onSuccess={() => {
+          setPage(0);
+          fetchTransactions();
+        }}
         transaction={editTransaction}
       />
     </div>

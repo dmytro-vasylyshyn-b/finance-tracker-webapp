@@ -1,0 +1,11 @@
+.btn-success {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #007bff !important;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 10px !important;
+  }
+  

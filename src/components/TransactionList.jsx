@@ -18,12 +18,13 @@ const TransactionList = ({ transactions, onEdit }) => {
             onClick={() => onEdit(tx)}
           >
             <div className="tx-header">
-              <span>{tx.category}</span>
+              <span>{tx.categoryName}</span>
               <span>
                 {tx.type === 'EXPENSE' ? '-' : '+'}
                 {tx.amount} ₴
               </span>
             </div>
+
             <div className="tx-footer">
               <span>{tx.description}</span>
               <span className="tx-date">
