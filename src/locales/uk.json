@@ -95,7 +95,6 @@
     "edit_transaction": "Редагувати транзакцію",
     "new_transaction": "Нова транзакція",
     "type": "Тип",
-    "amount": "Сума",
     "category": "Категорія",
     "custom_category": "Користувацька категорія",
     "description": "Опис",
@@ -105,6 +104,18 @@
     "investment": "Інвестиція",
     "choose": "Оберіть",
     "load_more": "Завантажити ще",
-    "show_all": "Відобразити всі"
+    "show_all": "Відобразити всі",
+    "balance": "Баланс",
+    "savings": "Збереження",
+    "expenses": "Витрати",
+    "investments": "Інвестиції",
+    "all": "Все",
+    "refresh": "Оновити",
+    "refreshing": "Оновлення...",
+    "monthly_overview": "За місяць",
+    "expenses_by_category": "Кругова діаграма за типом",
+    "bar_chart_comparison": "Стовпчикова діаграма",
+    "invalid_date_range": "Start date must be earlier than or equal to end date",
+    "fetch_error": "Failed to fetch transactions"
 }
   

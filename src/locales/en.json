@@ -47,7 +47,6 @@
     "profile_preview": "Profile Preview",
     "choose_photo": "Choose photo",
     "save_photo": "Save photo",
-    "save_photo": "Save photo",
     "rates_title": "Currency, Cryptocurrency, and Stock Rates",
     "currency_rates": "Currency Rates",
     "bank": "Bank",
@@ -83,7 +82,6 @@
     "currentAmount": "Amount Now",
     "inflation": "Annual Inflation (%)",
     "futureValue": "Future Value",
-    "amount": "Amount",
     "exchangeRate": "Exchange Rate",
     "convertedAmount": "Converted",
 
@@ -106,6 +104,18 @@
     "investment": "Investment",
     "choose": "Choose",
     "load_more": "Load More",
-    "show_all": "Ahow All"
+    "show_all": "Ahow All",
+    "balance": "Balance",
+    "savings": "Savings",
+    "expenses": "Expenses",
+    "investments": "Investments",
+    "all": "All",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "monthly_overview": "Monthly Overview",
+    "expenses_by_category": "Diagram by type",
+    "bar_chart_comparison": "Bar Chart Comparison",
+    "invalid_date_range": "Start date must be earlier than or equal to end date",
+    "fetch_error": "Failed to fetch transactions"
 }
   
