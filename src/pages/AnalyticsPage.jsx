@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "../api/axios";
+import './css/dashboard.css';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
@@ -151,40 +152,45 @@ export default function FinanceDashboard() {
   };
 
   return (
-    <div className="p-6 grid gap-6 bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen">
+    <div className="p-6 grid gap-6 bg-gray-50 dark:bg-gray-900 text-black dark:text-white min-h-screen">
+      {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {/* Summary Cards */}
-        <Card className="bg-white dark:bg-gray-800">
+        <Card className="bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
           <CardContent className="text-center p-4">
-            <h2 className="text-lg font-semibold">{t("balance")}</h2>
-            <p className="text-2xl font-bold">${balance.toFixed(2)}</p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("balance")}</h2>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">${balance.toFixed(2)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-gray-800">
-          <CardContent className="text-center p-4">
-            <h2 className="text-lg font-semibold">{t("savings")}</h2>
-            <p className="text-2xl font-bold">${savings.toFixed(2)}</p>
+        <Card className="card">
+          <CardContent className="p-4">
+            <h2 className="card-title">{t("savings")}</h2>
+            <p className="card-value savings">${savings.toFixed(2)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-gray-800">
-          <CardContent className="text-center p-4">
-            <h2 className="text-lg font-semibold">{t("income")}</h2>
-            <p className="text-2xl font-bold">${totalIncome.toFixed(2)}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-gray-800">
-          <CardContent className="text-center p-4">
-            <h2 className="text-lg font-semibold">{t("expenses")}</h2>
-            <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
-          </CardContent>
-        </Card>
-      </div>
 
+        <Card className="card">
+          <CardContent className="p-4">
+            <h2 className="card-title">{t("income")}</h2>
+            <p className="card-value income">${totalIncome.toFixed(2)}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="card">
+          <CardContent className="p-4">
+            <h2 className="card-title">{t("expenses")}</h2>
+            <p className="card-value expenses">${totalExpenses.toFixed(2)}</p>
+          </CardContent>
+        </Card>
+
+
+      </div>
+  
+      {/* Filters */}
       <div className="flex flex-wrap items-center gap-4">
         <DatePicker selected={startDate} onChange={setStartDate} />
         <DatePicker selected={endDate} onChange={setEndDate} />
         <select
-          className="border p-2 rounded bg-white dark:bg-gray-800 dark:text-white"
+          className="border border-gray-300 dark:border-gray-700 p-2 rounded bg-white dark:bg-gray-800 text-black dark:text-white"
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value)}
         >
@@ -193,22 +199,30 @@ export default function FinanceDashboard() {
           <option value="EXPENSE">{t("expenses")}</option>
           <option value="INVESTMENTS">{t("investments")}</option>
         </select>
-        <Button onClick={fetchData} disabled={isLoading || !isValidDateRange}>
+        <Button
+          className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
+          onClick={fetchData}
+          disabled={isLoading || !isValidDateRange}
+        >
           {isLoading ? t("refreshing") : t("refresh")}
         </Button>
-        <Button onClick={exportToExcel}>{t("download_excel")}</Button>
-        <Button onClick={exportToPDF}>{t("download_pdf")}</Button>
+        <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white" onClick={exportToExcel}>
+          {t("download_excel")}
+        </Button>
+        <Button className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white" onClick={exportToPDF}>
+          {t("download_pdf")}
+        </Button>
       </div>
-
+  
       {!isValidDateRange && (
         <p className="text-red-500">{t("invalid_date_range")}</p>
       )}
-
+  
+      {/* Area & Pie Charts */}
       <div ref={chartRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Area Chart */}
-        <Card className="bg-white dark:bg-gray-800">
+        <Card className="bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
           <CardContent className="p-4">
-            <h3 className="text-lg font-medium mb-2">{t("monthly_overview")}</h3>
+            <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">{t("monthly_overview")}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={monthlyData}>
                 <defs>
@@ -225,10 +239,9 @@ export default function FinanceDashboard() {
                     <stop offset="95%" stopColor="#ffc658" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
+                <XAxis dataKey="month" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                 <Legend />
                 <Area type="monotone" dataKey="income" stroke="#82ca9d" fill="url(#colorInc)" />
                 <Area type="monotone" dataKey="expenses" stroke="#8884d8" fill="url(#colorExp)" />
@@ -237,11 +250,10 @@ export default function FinanceDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* Pie Chart */}
-        <Card className="bg-white dark:bg-gray-800">
+  
+        <Card className="bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
           <CardContent className="p-4">
-            <h3 className="text-lg font-medium mb-2">{t("pie_chart_by_category")}</h3>
+            <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">{t("pie_chart_by_category")}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
@@ -249,24 +261,22 @@ export default function FinanceDashboard() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
-
+  
       {/* Bar Chart */}
-      <Card className="bg-white dark:bg-gray-800">
+      <Card className="bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
         <CardContent className="p-4">
-          <h3 className="text-lg font-medium mb-2">{t("bar_chart_comparison")}</h3>
+          <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">{t("bar_chart_comparison")}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="month" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
               <Legend />
               <Bar dataKey="income" fill="#82ca9d" />
               <Bar dataKey="expenses" fill="#8884d8" />
@@ -275,44 +285,24 @@ export default function FinanceDashboard() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
-      {/* ✅ Scatter Chart by Day */}
-      <Card className="bg-white dark:bg-gray-800">
+  
+      {/* Scatter Chart */}
+      <Card className="bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
         <CardContent className="p-4">
-          <h3 className="text-lg font-medium mb-2">{t("scatter_chart_by_day")}</h3>
+          <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">{t("scatter_chart_by_day")}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart margin={{ top: 20, right: 20, bottom: 10, left: 0 }}>
-              <CartesianGrid />
-              <XAxis dataKey="date" name="Date" type="category" />
-              <YAxis dataKey="amount" name="Amount" />
-              <Tooltip
-                cursor={{ strokeDasharray: "3 3" }}
-                formatter={(value, name) => [`$${value}`, name]}
-              />
+              <CartesianGrid stroke="#444" />
+              <XAxis dataKey="date" name="Date" type="category" stroke="#ccc" />
+              <YAxis dataKey="amount" name="Amount" stroke="#ccc" />
               <Legend />
-              <Scatter
-                name={t("income")}
-                data={scatterData.income}
-                fill="#82ca9d"
-                line={true}  // <-- додаємо тут
-              />
-              <Scatter
-                name={t("expenses")}
-                data={scatterData.expenses}
-                fill="#8884d8"
-                line={true}  // <-- і тут
-              />
-              <Scatter
-                name={t("investments")}
-                data={scatterData.investments}
-                fill="#ffc658"
-                line={true}  // <-- і тут
-              />
+              <Scatter name={t("income")} data={scatterData.income} fill="#82ca9d" line />
+              <Scatter name={t("expenses")} data={scatterData.expenses} fill="#8884d8" line />
+              <Scatter name={t("investments")} data={scatterData.investments} fill="#ffc658" line />
             </ScatterChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
     </div>
   );
 }
